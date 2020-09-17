@@ -1,13 +1,15 @@
 # omdemna_web_scrapping
 ## Description
-Information extraction from different official states of latinoamerica.
+Information extraction from official Sources for different states of latinoamerica.
 
-Structured using Country codes and States codes.
+Structured using Country codes and States codes. (GADM)
 ## Includes:
 Including: Leyes Federales de México (145 - 0)
+Including: Asamblea Legislativa de México (70 - 0)
 
 ## Deployment:
-*  Install python dependances
+*  Install python dependencies
+
         pip install requests
         pip install pickle
         pip install bs4
