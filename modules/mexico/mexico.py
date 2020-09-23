@@ -2,7 +2,7 @@ from requests import get
 from bs4 import BeautifulSoup
 import pickle
 import os
-from scrapper import Scrapper
+from scrapper import Scrapper, Document
 import pandas as pd
 import re
 import datetime
@@ -19,6 +19,7 @@ class MexicoCamaraDiputados(Scrapper):
         self.path = os.path.dirname(__file__)
         self.law_refs = []
         self.law_refs_exclude_list = ['ref/cpeum.htm']
+        self.maintainer = "Francisco Pérez"
 
     def extract_information(self):
         publications_page = get(self.URLs).content
@@ -57,9 +58,8 @@ class MexicoCamaraDiputados(Scrapper):
                     url = self.REF_URL + '/ref/' + info_block[1].find('a')['href']
                     if "_ima" not in url:
                         doc_format = url.split('.')[-1]
-                        sample = pd.DataFrame([[self.ISO, self.country_code, self.state_code, self.state_ISO,
-                                                self.source, title, resume, date, url, doc_format]],
-                                              columns=self.columns)
-                        self.resources = pd.concat([self.resources, sample], ignore_index=True)
+                        sample = Document(self.ISO, self.country_code, self.state_code, self.state_ISO, self.source,
+                                          None, None, title, resume, date, url, doc_format).to_dataframe()
+                        self.add_resource(sample)
 
         self.save_resources()

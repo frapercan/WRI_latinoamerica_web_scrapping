@@ -1,0 +1,18 @@
+{
+  "columns": [
+    "ISO",
+    "COUNTRY_CODE",
+    "STATE_CODE",
+    "STATE_ISO",
+    "SOURCE",
+    "ID",
+    "CONCEPT",
+    "TITLE",
+    "RESUME",
+    "PUBLICATION_DATE",
+    "URL",
+    "DOC_TYPE",
+    "SCRAPING_STATUS",
+    "TIMESTAMP"
+  ]
+}

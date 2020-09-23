@@ -1,11 +1,20 @@
 from modules.mexico.mexico import MexicoCamaraDiputados
 from modules.elsalvador.elsalvador import ElSalvadorAsambleaLegislativa
 from scrapper import Scrapper
+from modules.peru.peru import PeruCongreso
+from selenium_client import SeleniumClient
+
+
+
+
+
+
 
 threads = 5
-driver_path = '/usr/lib/chromium-browser/chromedriver'
 
 if __name__ == '__main__':
+    selenium_client = SeleniumClient()
+
 
     scrapper = MexicoCamaraDiputados()
     scrapper.load_resources()
@@ -15,8 +24,14 @@ if __name__ == '__main__':
     scrapper.load_resources()
     scrapper.extract_information()
 
-    scrapper.save_to_csv('muestra.csv')
+    selenium_client.start()
+    scrapper = PeruCongreso(selenium_client.browser)
+    scrapper.load_resources()
+    scrapper.extract_information()
+    selenium_client.stop()
 
+
+    scrapper.save_to_csv('muestra.csv')
 
     scrapper = Scrapper()
     scrapper.load_resources()

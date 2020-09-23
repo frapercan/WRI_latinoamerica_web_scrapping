@@ -5,22 +5,59 @@ import pickle
 import os
 import pandas as pd
 import re
+import json
+
+
+class Document:
+    def __init__(self, iso, country_code, state_code, state_iso, source, official_id, concept,
+                 title, resume, publication_date,
+                 url, doc_type, scraping_status=None, timestamp=None):
+        self.iso = iso
+        self.country_code = country_code
+        self.state_code = state_code
+        self.state_iso = state_iso
+        self.source = source
+        self.official_id = official_id
+        self.concept = concept
+        self.title = title
+        self.resume = resume
+        self.publication_date = publication_date
+        self.url = url
+        self.doc_type = doc_type
+        self.scraping_status = scraping_status
+        self.timestamp = timestamp
+
+    def to_dataframe(self):
+        with open('config.json') as config_file:
+            columns = json.load(config_file)['columns']
+        df = pd.DataFrame(
+            [[self.iso, self.country_code, self.state_code, self.state_iso, self.source, self.official_id, self.concept,
+             self.title, self.resume, self.publication_date, self.url, self.doc_type, self.scraping_status,
+             self.timestamp]], columns=columns)
+        return df
+
+
+
 
 
 class Scrapper:
-    def __init__(self, driver_path='/usr/lib/chromium-browser/chromedriver'):
+    def __init__(self, browser=None):
         self.country_code = None
         self.ISO = None
         self.state_code = None
         self.state_ISO = None
         self.state_name = None
-        self.columns = ['ISO', 'COUNTRY_CODE', 'STATE_CODE', 'STATE_ISO', 'SOURCE', 'TITLE', 'RESUME',
-                        'PUBLICATION_DATE', 'URL',
-                        'DOC_TYPE']
+        with open('config.json') as config_file:
+            columns = json.load(config_file)['columns']
+        self.columns = columns
         self.resources = pd.DataFrame(
             columns=self.columns)
-        self.path = None
-        self.driver_path = driver_path
+        self.browser = browser
+        with open('concepts.json') as config_file:
+            concepts = json.load(config_file)
+        self.concepts = concepts
+        self.maintainer = "Undefined"
+
 
     def load_resources(self):
         try:
@@ -31,6 +68,9 @@ class Scrapper:
     def save_resources(self):
         pickle.dump(self.resources, open("resources.p", "wb"))
         print("Resources correctly saved")
+
+    def add_resource(self,dataframe):
+        self.resources = pd.concat([self.resources, dataframe], ignore_index=True)
 
     def save_to_csv(self, name):
         self.resources.to_csv(name)
@@ -68,7 +108,7 @@ class Scrapper:
         print("Country name:{}".format(self.ISO))
         print("State code:{}".format(self.state_code))
         print("State name:{}".format(self.state_name))
-        print("References loaded: {}".format(len(self.resources.keys())))
+        print("References loaded: {}".format(self.resources[['COUNTRY_CODE' == self.country_code]]))
         dirname = os.path.dirname(__file__)
         filename = os.path.join(dirname, "codes/" + self.country_code + "")
         print("Avaliable documents: {}".format(len(os.listdir(filename))))
@@ -83,3 +123,4 @@ class DownloadProgressBar(tqdm):
         if tsize is not None:
             self.total = tsize
         self.update(b * bsize - self.n)
+

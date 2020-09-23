@@ -2,7 +2,7 @@ from requests import get
 from bs4 import BeautifulSoup
 import pickle
 import os
-from scrapper import Scrapper
+from scrapper import Scrapper, Document
 import pandas as pd
 import datetime
 
@@ -14,10 +14,11 @@ class ElSalvadorAsambleaLegislativa(Scrapper):
         self.source = "Asamblea Legislativa"
         self.country_code = '70'
         self.ISO = 'SLV'
-        self.URLs = ["https://www.asamblea.gob.sv/decretos/decretosporanio/{}/0".format(year) for year in range(2020,2015 , -1)]
+        self.URLs = ["https://www.asamblea.gob.sv/decretos/decretosporanio/{}/0".format(year) for year in range(2020,2019 , -1)]
         self.REF_URL = "https://www.asamblea.gob.sv"
         self.path = os.path.dirname(__file__)
         self.law_refs = []
+        self.maintainer = "Francisco Pérez"
 
     def extract_information(self):
         for url in self.URLs:
@@ -64,14 +65,13 @@ class ElSalvadorAsambleaLegislativa(Scrapper):
             url = self.REF_URL + url
             doc_format = url.split('.')[-1]
             if self.url_regcheck(url):
-                print(True)
                 if doc_format in ['pdf','doc']:
-                    sample = pd.DataFrame([[self.ISO, self.country_code, self.state_code, self.state_ISO, self.source, title, resume, date, url, doc_format]], columns = self.columns)
-                    self.resources = pd.concat([self.resources,sample], ignore_index=True)
+                        sample = Document(self.ISO, self.country_code, self.state_code, self.state_ISO, self.source,
+                                          None, None, title, resume, date, url, doc_format).to_dataframe()
+                        self.add_resource(sample)
                 else:
                     print(url,doc_format)
             else:
-                print(False)
                 print(url,doc_format)
         self.save_resources()
 
